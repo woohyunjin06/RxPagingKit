@@ -63,6 +63,11 @@ class RxPagingContentViewControllerDelegateProxy: DelegateProxy<PagingContentVie
         return (subject, ControlEvent<(Int, Bool)>(events: subject.asObserver()))
     }()
     
+    let (didFinishReloadingSubject, didFinishReloading): (PublishSubject<Void>, ControlEvent<Void>) = {
+        let subject = PublishSubject<Void>()
+        return (subject, ControlEvent<Void>(events: subject.asObserver()))
+    }()
+    
     init(pagingContentViewController: PagingContentViewController) {
         super.init(parentObject: pagingContentViewController, delegateProxy: RxPagingContentViewControllerDelegateProxy.self)
     }

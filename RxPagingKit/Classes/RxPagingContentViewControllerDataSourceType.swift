@@ -55,9 +55,14 @@ public class RxPagingContentViewControllerReactiveArrayDataSource {
         return item
     }
     
+    let didFinishReloadingSubject: PublishSubject<Void>
     let vcFactory: VCFactory
     
-    public init(vcFactory: @escaping VCFactory) {
+    public init(
+        didFinishReloadingSubject: PublishSubject<Void>,
+        vcFactory: @escaping VCFactory
+    ) {
+        self.didFinishReloadingSubject = didFinishReloadingSubject
         self.vcFactory = vcFactory
     }
     
@@ -66,9 +71,11 @@ public class RxPagingContentViewControllerReactiveArrayDataSource {
 extension RxPagingContentViewControllerReactiveArrayDataSource: RxPagingContentViewControllerDataSourceType {
     
     public func pagingViewController(_ pagingMenuViewController: PagingContentViewController, observedEvent: Event<[UIViewController]>) {
-        Binder(self) { dataSource, elements in
+        Binder(self) { [weak self] dataSource, elements in
             dataSource.itemModels = elements
-            pagingMenuViewController.reloadData()
+            pagingMenuViewController.reloadData {
+                self?.didFinishReloadingSubject.onNext(Void())
+            }
         }.on(observedEvent)
     }
     

@@ -34,7 +34,9 @@ extension Reactive where Base: PagingContentViewController {
         where O.Element == [UIViewController] {
             
             return { source in
-                let dataSource = RxPagingContentViewControllerReactiveArrayDataSource { _, viewController in
+                let dataSource = RxPagingContentViewControllerReactiveArrayDataSource(
+                    didFinishReloadingSubject: delegate.didFinishReloadingSubject
+                ) { _, viewController in
                     return viewController
                 }
                 return self.viewControllers(dataSource: dataSource)(source)
@@ -46,7 +48,9 @@ extension Reactive where Base: PagingContentViewController {
             
             return { source in
                 return { configureVC in
-                    let dataSource = RxPagingContentViewControllerReactiveArrayDataSource { index, viewController in
+                    let dataSource = RxPagingContentViewControllerReactiveArrayDataSource(
+                        didFinishReloadingSubject: delegate.didFinishReloadingSubject
+                    ) { index, viewController in
                         return configureVC(index, viewController)
                     }
                     return self.viewControllers(dataSource: dataSource)(source)
@@ -106,6 +110,10 @@ extension Reactive where Base: PagingContentViewController {
     
     public var didFinishPaging: ControlEvent<(Int, Bool)> {
         return delegate.didFinishPaging
+    }
+    
+    public var didFinishReloading: ControlEvent<Void> {
+        return delegate.didFinishReloading
     }
     
     public func scroll(animated: Bool) -> Binder<Int> {
